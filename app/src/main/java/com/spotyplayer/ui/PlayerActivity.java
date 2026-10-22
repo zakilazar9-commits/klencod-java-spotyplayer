@@ -9,7 +9,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.spotyplayer.R;
-import java.io.IOException;
 
 public class PlayerActivity extends AppCompatActivity {
 
@@ -43,23 +42,28 @@ public class PlayerActivity extends AppCompatActivity {
 
         playSong(path);
 
-        btnBack.v -> onBackPressed();
-        btnPlayPause.v -> {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.pause();
-                btnPlayPause.setImageResource(R.drawable.ic_play);
-            } else {
-                mediaPlayer.start();
-                btnPlayPause.setImageResource(R.drawable.ic_pause);
+        btnBack.setOnClickListener(v -> onBackPressed());
+        
+        btnPlayPause.setOnClickListener(v -> {
+            if (mediaPlayer != null) {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
+                    btnPlayPause.setImageResource(R.drawable.ic_music_note);
+                } else {
+                    mediaPlayer.start();
+                    btnPlayPause.setImageResource(R.drawable.ic_music_note);
+                }
             }
-        };
+        });
     }
 
     private void playSong(String path) {
         try {
             mediaPlayer = MediaPlayer.create(this, Uri.parse(path));
-            mediaPlayer.start();
-            setupVisualizer();
+            if (mediaPlayer != null) {
+                mediaPlayer.start();
+                setupVisualizer();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,7 +93,10 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (visualizer != null) visualizer.release();
+        if (visualizer != null) {
+            visualizer.release();
+            visualizer = null;
+        }
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
